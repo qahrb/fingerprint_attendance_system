@@ -1,17 +1,16 @@
 #this is the driver file that connects the backend code to the gui
 import os
 import htmlPy
-#from PyQt4 import QtGui
 import sys
-
-
+#from PyQt4 import QtGui
 
 # Initial confiurations
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-
 # GUI initializations
-app = htmlPy.AppGUI(title=u"Application", maximized=True, plugins=True)
+app = htmlPy.AppGUI(title=u"Application",developer_mode=True)
+app.maximized = True
+
 
 
 # GUI configurations
@@ -24,17 +23,17 @@ app.web_app.setMinimumWidth(1024)
 app.web_app.setMinimumHeight(768)
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
-# Binding of back-end functionalities with GUI
+app.template = ("index.html", {})# Binding of back-end functionalities with GUI
 
 # Import back-end functionalities
-from backend_code import ClassName
+from backend_code import backend
 
 # Register back-end functionalities
-app.bind(ClassName(app))
+app.bind(backend(app))
 
 
 # Instructions for running application
-print __name__
+
 if __name__ == "__main__":
     # The driver file will have to be imported everywhere in back-end.
     # So, always keep app.start() in if __name__ == "__main__" conditional

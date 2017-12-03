@@ -30,7 +30,6 @@ class backend(htmlPy.Object):
 
         form_data = json.loads(json_data)
         print form_data
-        self.app_gui.html.append= "helloworld"
         print (json.dumps(form_data))
         self.app_gui.template = ("./value.html", {"template_variable_name": "value"})
         return json.dumps(form_data)

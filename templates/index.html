@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title></title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $("#hello").click(function(){
-                $("#div1").text("ehllow world")
-            });
-        });
-        </script>
-</head>
-<body>
+{% extends "heade.html" %}
+{% body block %}
         <form action="backend.form_function_name" id="form" data-bind="true">
             <input type="text" id="form_input" name="name">
             <input type="submit" value="Submit" id="form_submit">
         </form>
 
-</body>
-</html>
+{% endblock %}

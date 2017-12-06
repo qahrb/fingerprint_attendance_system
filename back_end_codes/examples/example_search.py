@@ -9,7 +9,7 @@ All rights reserved.
 """
 
 import hashlib
-from pyfingerprint.pyfingerprint import PyFingerprint
+from pyfingerprint import PyFingerprint
 
 
 ## Search for a finger
@@ -17,7 +17,7 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 
 ## Tries to initialize the sensor
 try:
-    f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+    f = PyFingerprint('/dev/tty.SLAB_USBtoUART', 57600, 0xFFFFFFFF, 0x00000000)
 
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')

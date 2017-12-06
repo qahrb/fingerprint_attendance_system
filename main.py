@@ -2,6 +2,10 @@
 import os
 import htmlPy
 import sys
+from flask import flash
+
+
+
 #from PyQt4 import QtGui
 
 # Initial confiurations
@@ -18,18 +22,22 @@ app.static_path = os.path.join(BASE_DIR, "static/")
 app.template_path = os.path.join(BASE_DIR, "templates/")
 importPath = os.path.join(BASE_DIR,"back_end_codes")
 sys.path.append(importPath)
+from content_management import Content
+TOPIC_DICT = Content()
 
-app.web_app.setMinimumWidth(1024)
+app.web_app.setMinimumWidth(200)
 app.web_app.setMinimumHeight(768)
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
-app.template = ("index.html", {})# Binding of back-end functionalities with GUI
+# app.template = ("index.html", TOPIC_DICT)
+app.template = ("login.html", TOPIC_DICT)
 
+# # Binding of back-end functionalities with GUI
 # Import back-end functionalities
-from backend_code import backend
+from backend_code import enroll
 
 # Register back-end functionalities
-app.bind(backend(app))
+app.bind(enroll(app))
 
 
 # Instructions for running application

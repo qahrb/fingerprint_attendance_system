@@ -1,10 +1,23 @@
+ {% extends "header.html" %} {% block body %}
 
-{% extends "heade.html" %}
-{% body block %}
+<form action="enroll.login" id="form" data-bind="true">
+    <input type="text" id="form_input" name="id">
+    <input type="password" id="form_input" name="password">
+    <input type="submit" value="Submit" id="form_submit">
+</form>
 
-        <form action="backend.form_function_name" id="form" data-bind="true">
-            <input type="text" id="form_input" name="id">
-            <input type="submit" value="Submit" id="form_submit">
-        </form>
+{% for t in error %}
+<li>{{t}}</li>
+{% endfor %}
+
+<ul>
+    {% for t in Basics %}
+    <li>
+        <a href="{{t[1]}}">{{t[0]}}</a>
+    </li>
+    {% endfor %}
+</ul>
+<script>
+</script>
 
 {% endblock %}

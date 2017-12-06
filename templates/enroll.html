@@ -1,0 +1,19 @@
+{% extends "header.html" %} {% block body %}
+<div class="row">
+    <div class="col-sm-offset-4 col-sm-4">
+        <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/emu-logo.png'|staticfile}}"
+            alt="logo">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12  text-center">
+        <h6>EMU Fingerprint Registration Portal</h6>
+    </div>
+</div>
+<div class="row">
+    <form action="enroll.check_student" id="form" data-bind="true">
+        <input type="text" id="form_input" name="student_id">
+        <input type="submit" value="Submit" id="form_submit">
+    </form>
+</div>
+{% endblock %}

@@ -1,14 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    {% block head %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <!-- JqueryJs -->
+    <script src="{{'js/jquery.js'|staticfile}}"></script>
+    <!-- BootstrapJs -->
+    <script src="{{'js/bootstrap.min.js'|staticfile}}"></script>
+    <!-- Bootstrap -->
+    <link href="{{'css/bootstrap.min.css'|staticfile}}" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+    <script>
+        $(document).ready(backend.javascript_function());
+    </script>
+    <style>
+        .form-control:focus {
+            border-color: rgb(36, 62, 114);
+            /* there is something worng with the following defination with qtwebqt */
+            /* box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6); */
+            -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+        }
+
+         ::-webkit-input-placeholder {
+            color: red;
+            text-align: center;
+        }
+
+        input {
+            text-align: center
+        }
+
+        .divme {
+            
+            /* background-color: red; */
+
+            position: absolute;
+            top: 25%;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            margin: auto;
+        }
+    </style>
+    {% endblock %}
 </head>
-<body>
-    hello <br>
-    {% block body %} {%endblock%}
-    <br>
+
+<body class="divme">
+
+    <!-- Printing errors or messages -->
+    {% if errors%} {% for error in errors%}
+    <div class="alert alert-warning alert-dismissable" role="alert">{{error}} </div>
+    {% endfor %} {% endif %}
+
+    <!-- MainBody -->
+    <div class="container">
+        {% block body %} {%endblock%}
+    </div>
+
 </body>
+
 </html>

@@ -1,11 +1,13 @@
 import json
 import requests
 import htmlPy
-
+from fingerprint import fingerprint as f
+import time
 
 class enroll(htmlPy.Object):
     # GUI callable functions have to be inside a class.
     # The class should be inherited from htmlPy.Object.
+########################################################################################################################
 
     def __init__(self,app_gui):
         super(enroll, self).__init__()
@@ -75,15 +77,36 @@ class enroll(htmlPy.Object):
 ########################################################################################################################
 
     @htmlPy.Slot()
-    def function_name(self):
-        # This is the function exposed to GUI events.
-        # You can change app HTML from here.
-        # Or, you can do pretty much any python from here.
-        #
-        # NOTE: @htmlPy.Slot decorater needs argument and return data-types.
-        # Refer to API documentation.
+    def register_first(self):
+        #creating a finger scanning instance by intiating the connection to the sensor
+        self.finger= f()
+        #getting the first scan of a fingerprint.
+        if(self.finger.get_finger_template_first() == -1):
+            self.app_gui.template = ("./enroll.html", {"errors": [" Please try putting your fingers better :) "]})
+        #alerting the user to remove his finger
         return
+########################################################################################################################
 
+    @htmlPy.Slot()
+    def sleep(self):
+        time.sleep(4)
+        return 
+########################################################################################################################
+
+    @htmlPy.Slot()
+    def register_last(self):
+        time.sleep(2)
+        list=self.finger.get_finger_template_final()
+        #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
+        if(list==0):
+            self.app_gui.template = ("./enroll.html", {"errors": [" Fingers doesn't match :) "]})
+        # this means that there had been an unknown problem
+        if(list== -1):
+            self.app_gui.template = ("./enroll.html", {"errors": [" sorry there had been a problem :) "]})
+        print list
+
+        return
+########################################################################################################################
     @htmlPy.Slot()
     def javascript_function(self):
 

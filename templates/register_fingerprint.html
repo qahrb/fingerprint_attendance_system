@@ -3,24 +3,53 @@
 <!-- The following is the student_id submission field to check if he is enrolled or no -->
 
 <!-- Printing errors or messages -->
+<script>
+    function sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+</script>
+<script>
+
+while(1){
 
 
-<div class="row">
+    step = 3;
+    if(step==2){};
+
+    $("#link").click(function(){
+        $( ".hi" ).append( "<p>Please remove your finger</p>" ); 
+        enroll.register_first();
+        enroll.sleep();
+        $( ".hi" ).append( "<p>Please put your finger</p>" ); 
+        enroll.register_last();
+    });
+
+}    
+    // You can treat the class inherited from htmlPy.Object (in this case, ClassName)
+    // as a javascript object.
+</script>
+
+
+<div class="row text-center">
     <div class="col-md-12">
-        <ul>
-            <li>Id : {{id}}</li>
-            <li>Name : {{name}}</li>
-        </ul>
+        Id : {{id}}
+        <br> Name : {{name}}
     </div>
 </div>
 
 <div class="row text-center">
     <div class="col-md-12">
-        Ask the student to put his finger on the button.
+        <br>Ask the student to put his finger on the button.
         <br> Then click here
-        <a href="enroll.register" id="link" data-bind="true">
-            <button>Scan</button>
+        <br>
+        <a href="enroll.register_first" id="link" data-bind="true">scan
         </a>
+    </div>
+</div>
+
+<div class="row text-center" id="hide">
+    <div class="col-md-12 hi">
+
     </div>
 </div>
 

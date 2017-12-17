@@ -3,8 +3,11 @@ import os
 import htmlPy
 import sys
 from flask import flash
+import PySide
 
 
+
+PySide.QtCore.Qt.FramelessWindowHint
 
 #from PyQt4 import QtGui
 
@@ -27,6 +30,9 @@ TOPIC_DICT = Content()
 
 app.web_app.setMinimumWidth(200)
 app.web_app.setMinimumHeight(768)
+# app.window.setWindowFlags(PySide.QtCore.Qt.FramelessWindowHint)
+# app.window.setWindowFlags(PySide.QtCore.Qt.WindowFullScreen)
+app.window.showFullScreen()
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
 # app.template = ("index.html", TOPIC_DICT)

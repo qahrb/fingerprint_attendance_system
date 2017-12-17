@@ -34,9 +34,8 @@
         }
 
         .divme {
-            
-            /* background-color: red; */
 
+            /* background-color: red; */
             position: absolute;
             top: 25%;
             bottom: 0;
@@ -51,15 +50,35 @@
 
 <body class="divme">
 
+
+
+
+    
+    <div class="container">
+        
+        <!-- header image -->
+        <div class="row ">
+            <div class="col-sm-offset-4 col-sm-4">
+                <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/emu-logo.png'|staticfile}}"
+                    alt="logo">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12  text-center">
+                <h6>EMU Fingerprint Registration Portal</h6>
+            </div>
+        </div>
+
+        <!-- MainBody -->
+        {% block body %} {%endblock%}
+        <!-- ________ -->
+
+    </div>
+
     <!-- Printing errors or messages -->
     {% if errors%} {% for error in errors%}
     <div class="alert alert-warning alert-dismissable" role="alert">{{error}} </div>
     {% endfor %} {% endif %}
-
-    <!-- MainBody -->
-    <div class="container">
-        {% block body %} {%endblock%}
-    </div>
 
 </body>
 

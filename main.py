@@ -30,7 +30,7 @@ app.web_app.setMinimumHeight(768)
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
 # app.template = ("index.html", TOPIC_DICT)
-app.template = ("login.html", TOPIC_DICT)
+app.template = ("enroll.html", TOPIC_DICT)
 
 # # Binding of back-end functionalities with GUI
 # Import back-end functionalities

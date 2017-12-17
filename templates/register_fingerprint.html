@@ -1,0 +1,27 @@
+{% extends "header.html" %} {% block body %}
+
+<!-- The following is the student_id submission field to check if he is enrolled or no -->
+
+<!-- Printing errors or messages -->
+
+
+<div class="row">
+    <div class="col-md-12">
+        <ul>
+            <li>Id : {{id}}</li>
+            <li>Name : {{name}}</li>
+        </ul>
+    </div>
+</div>
+
+<div class="row text-center">
+    <div class="col-md-12">
+        Ask the student to put his finger on the button.
+        <br> Then click here
+        <a href="enroll.register" id="link" data-bind="true">
+            <button>Scan</button>
+        </a>
+    </div>
+</div>
+
+{% endblock %}

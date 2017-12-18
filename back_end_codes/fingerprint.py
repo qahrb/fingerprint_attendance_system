@@ -1,8 +1,8 @@
 import pyfingerprint.find_port
-from pyfingerprint.pyfingerprint import PyFingerprint as p
 import sys
 import glob
 import time
+from pyfingerprint.pyfingerprint import PyFingerprint as p
 
 class fingerprint():
 
@@ -62,7 +62,7 @@ class fingerprint():
             self.f.createTemplate()
 
             t=self.f.downloadCharacteristics(0x01)
-            
+            self.f.clearDatabase()
             print('Finger returned successfully!')
             return t
 

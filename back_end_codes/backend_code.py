@@ -62,12 +62,12 @@ class enroll(htmlPy.Object):
         except Exception:
             self.app_gui.template = ("./enroll.html", {"errors": ["Server down :(. Try again later. "]})
             
-        hello=r.json()
-        
-        if( hello["message"] == None):
+        self.hello=r.json()
+        print self.hello
+        if( self.hello["message"] == None):
 
-            if( hello["finger_print"]== None ):
-                self.app_gui.template = ("./register_fingerprint.html", hello)
+            if( self.hello["finger_print"]== None ):
+                self.app_gui.template = ("./register_fingerprint.html", self.hello)
             else:
                 self.app_gui.template = ("./enroll.html", {"errors": [" This student is already registered. "]})
 
@@ -77,25 +77,16 @@ class enroll(htmlPy.Object):
 ########################################################################################################################
 
     @htmlPy.Slot()
-    def register_first(self):
+    def register(self):
+                            ##################################        
+        url="http://localhost/api/student/enroll_add_student_fingerprint.php"
         #creating a finger scanning instance by intiating the connection to the sensor
         self.finger= f()
         #getting the first scan of a fingerprint.
         if(self.finger.get_finger_template_first() == -1):
             self.app_gui.template = ("./enroll.html", {"errors": [" Please try putting your fingers better :) "]})
         #alerting the user to remove his finger
-        return
-########################################################################################################################
-
-    @htmlPy.Slot()
-    def sleep(self):
-        time.sleep(4)
-        return 
-########################################################################################################################
-
-    @htmlPy.Slot()
-    def register_last(self):
-        time.sleep(2)
+        time.sleep(3)
         list=self.finger.get_finger_template_final()
         #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
         if(list==0):
@@ -103,15 +94,28 @@ class enroll(htmlPy.Object):
         # this means that there had been an unknown problem
         if(list== -1):
             self.app_gui.template = ("./enroll.html", {"errors": [" sorry there had been a problem :) "]})
-        print list
+                            ##################################
+        #in the following the list is being added to a dictionary function so it can be sended as a json string to the server
+        fingerprint_template={'fingerprint_template':json.dumps(list)}
+        
+        #now we are adding the student's dictonary definations to the fingerprint defination so it could be sent to the server 
+        z = dict(self.hello.items() + fingerprint_template.items())
+        # print json.dumps(z)
+                            ##################################
+        try:
+            #The following is the request to check if this student is already enrolled or no
+            r = requests.post(url, data = json.dumps(z))
+        except Exception:
+            self.app_gui.template = ("./enroll.html", {"errors": ["Server down :( . Try again later. "]})
+        print r.content
 
-        return
-########################################################################################################################
-    @htmlPy.Slot()
-    def javascript_function(self):
+        hello=r.json()
+                             ##################################       
+        if( hello["message"] == "finger Print was recorded." ):
+            self.app_gui.template =  ("./enroll.html", {"successes": [" Fingerprint registered sucessfully "]})
+        else:
+            self.app_gui.template = ("./enroll.html", {"errors": [" Some errors on the server side occured.<br>Please try again later."]})
 
-        # Any function decorated with @htmlPy.Slot decorater can be called
-        # using javascript in GUI
+        return 
 
-        print "mama helwa"
-        return
+    

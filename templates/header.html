@@ -4,7 +4,7 @@
 <head>
     {% block head %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- JqueryJs -->
     <script src="{{'js/jquery.js'|staticfile}}"></script>
@@ -37,7 +37,7 @@
 
             /* background-color: red; */
             position: absolute;
-            top: 25%;
+            top: 15%;
             bottom: 0;
             left: 0;
             right: 0;
@@ -53,18 +53,18 @@
 
 
 
-    
+
     <div class="container">
-        
+
         <!-- header image -->
         <div class="row ">
             <div class="col-sm-offset-4 col-sm-4">
-                <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/emu-logo.png'|staticfile}}"
+                <img class=" img-responsive " style="display:block;margin:auto;max-height:200px;max-height:200px" src="{{'img/emu-logo.png'|staticfile}}"
                     alt="logo">
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12  text-center">
+            <div class="col-sm-12  text-center">
                 <h6>EMU Fingerprint Registration Portal</h6>
             </div>
         </div>
@@ -73,13 +73,36 @@
         {% block body %} {%endblock%}
         <!-- ________ -->
 
+
+
+
+        <!-- Printing errors or messages -->
+
+        <div class="row">
+            <div class="col-sm-offset-4 col-sm-4">
+                {% if errors%} {% for error in errors%}
+                <div class="alert alert-warning alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{error}}
+                </div>
+                {% endfor %} {% endif %}
+            </div>
+        </div>
+
+        <!-- Printing success alerts -->
+
+        <div class="row">
+                <div class="col-sm-offset-4 col-sm-4">
+                    {% if successes%} {% for success in successes%}
+                    <div class="alert  alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        {{success}}
+                    </div>
+                    {% endfor %} {% endif %}
+                </div>
+            </div>
+
     </div>
-
-    <!-- Printing errors or messages -->
-    {% if errors%} {% for error in errors%}
-    <div class="alert alert-warning alert-dismissable" role="alert">{{error}} </div>
-    {% endfor %} {% endif %}
-
 </body>
 
 </html>

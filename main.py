@@ -7,7 +7,7 @@ import PySide
 
 
 
-PySide.QtCore.Qt.FramelessWindowHint
+# PySide.QtCore.Qt.FramelessWindowHint
 
 #from PyQt4 import QtGui
 
@@ -16,7 +16,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # GUI initializations
 app = htmlPy.AppGUI(title=u"Application",developer_mode=True)
-app.maximized = True
+# app.maximized = True
 
 
 
@@ -28,11 +28,12 @@ sys.path.append(importPath)
 from content_management import Content
 TOPIC_DICT = Content()
 
-app.web_app.setMinimumWidth(200)
-app.web_app.setMinimumHeight(768)
+app.web_app.setMinimumWidth(300)
+app.web_app.setMinimumHeight(500)
+
 # app.window.setWindowFlags(PySide.QtCore.Qt.FramelessWindowHint)
 # app.window.setWindowFlags(PySide.QtCore.Qt.WindowFullScreen)
-app.window.showFullScreen()
+# app.window.showFullScreen()
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
 # app.template = ("index.html", TOPIC_DICT)

@@ -3,7 +3,11 @@ import requests
 import htmlPy
 from fingerprint import fingerprint as f
 import time
+from ast import literal_eval
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 class enroll(htmlPy.Object):
     # GUI callable functions have to be inside a class.
     # The class should be inherited from htmlPy.Object.
@@ -15,6 +19,7 @@ class enroll(htmlPy.Object):
         self.token= None
         # Initialize the class here, if required.
         return
+
 
 ########################################################################################################################
 
@@ -66,7 +71,7 @@ class enroll(htmlPy.Object):
         print self.hello
         if( self.hello["message"] == None):
 
-            if( self.hello["finger_print"]== None ):
+            if( self.hello["fingerprint_template"]== None ):
                 self.app_gui.template = ("./register_fingerprint.html", self.hello)
             else:
                 self.app_gui.template = ("./enroll.html", {"errors": [" This student is already registered. "]})
@@ -96,6 +101,7 @@ class enroll(htmlPy.Object):
             self.app_gui.template = ("./enroll.html", {"errors": [" sorry there had been a problem :) "]})
                             ##################################
         #in the following the list is being added to a dictionary function so it can be sended as a json string to the server
+        # print list
         fingerprint_template={'fingerprint_template':json.dumps(list)}
         
         #now we are adding the student's dictonary definations to the fingerprint defination so it could be sent to the server 
@@ -118,4 +124,109 @@ class enroll(htmlPy.Object):
 
         return 
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+class attendance(htmlPy.Object):
     
+    def __init__(self,app_gui):
+        super(attendance, self).__init__()
+        self.app_gui = app_gui
+        self.token= None
+        # Initialize the class here, if required.
+        return
+
+    @htmlPy.Slot(str, result=str)
+    def test(self, json_data):
+        url="http://localhost/api/student/enroll_find_student_fingerprint.php"
+        # @htmlPy.Slot(arg1_type, arg2_type, ..., result=return_type)
+        # This function can be used for GUI forms.
+        form_data = json.loads(json_data)
+        #this print the student id given by the client through the api
+        print (json.dumps(form_data))
+
+        if(form_data['student_id']==None):
+            self.app_gui.template = ("./test.html", {"errors": [" Please enter a student id "]})
+
+        try:
+            #The following is the request to check if this student is already enrolled or no
+            r = requests.post(url, data = json.dumps(form_data))
+        except Exception:
+            self.app_gui.template = ("./test.html", {"errors": ["Server down :(. Try again later. "]})
+
+        hello=r.content
+        hello= json.loads(hello)
+        print type(hello["fingerprint_template"].encode('utf-8'))
+        #literal eval is used to change the string from the template and in a python list
+        print literal_eval(hello["fingerprint_template"])
+        print type(literal_eval(hello["fingerprint_template"]))
+
+        if( hello["message"] == None):
+
+            if( hello["fingerprint_template"]== None ):
+                self.app_gui.template = ("./test.html", {"errors": [" This student fingerprint is not registered. "]})
+            else:
+                
+                finger= f()
+                test=finger.student_finger_test(literal_eval(hello["fingerprint_template"]))
+                #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
+                if(test==1):
+                    self.app_gui.template= ("./test.html",{"successes":["Yay it works!!! :) "]})
+                if(test==0):
+                    self.app_gui.template = ("./test.html", {"errors": [" Fingers doesn't match :)<br>Try licking your finger"]})
+                # this means that there had been an unknown problem
+                if(test== -1):
+                    self.app_gui.template = ("./test.html", {"errors": [" sorry there had been a problem :) "]})
+
+            
+
+        else:
+            self.app_gui.template = ("./enroll.html", {"errors": [" The Student Id you entered is wrong. Please enter a correct one"]})
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+#routing class for the links in the app
+class routing(htmlPy.Object):
+    
+    def __init__(self,app_gui):
+
+        super(routing, self).__init__()
+        self.app_gui = app_gui
+        self.token= None
+        # Initialize the class here, if required.
+        return
+
+########################################################################################################################
+
+    @htmlPy.Slot(str, result=str)
+    def home(self, json_data):
+    
+        form_data = json.loads(json_data)
+
+        if(form_data['route']=="enroll"):
+            self.app_gui.template = ("./enroll.html", { })
+
+        if(form_data['route']=="attendance"):
+            self.app_gui.template = ("./attendance.html", { })
+
+        if(form_data['route']=="test"):
+            self.app_gui.template = ("./test.html", { })
+    
+        return 
+########################################################################################################################    
+
+    @htmlPy.Slot(str, result=str)
+    def header(self, json_data):
+    
+        form_data = json.loads(json_data)
+
+        print form_data['route']
+        if(form_data['route']=="home"):
+            self.app_gui.template = ("./home.html", { })
+
+        return 
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################

@@ -1,0 +1,21 @@
+{% extends "header.html" %} {% block body %}
+
+<div class="row">
+    <div class="col-xs-offset-4 col-xs-4 text-center">
+
+        <form action="routing.home" id="form" data-bind="true">
+            <input type="submit" class="btn btn-primary btn-lg btn-block" value="enroll" name="route" />
+        </form>
+        <br>
+        <form action="routing.home" id="form" data-bind="true">
+            <input type="submit" class="btn btn-primary btn-lg btn-block" value="attendance" name="route" />
+        </form>
+        <br>
+        <form action="routing.home" id="form" data-bind="true">
+            <input type="submit" class="btn btn-primary btn-lg btn-block" value="test" name="route" />
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

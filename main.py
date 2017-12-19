@@ -28,8 +28,8 @@ sys.path.append(importPath)
 from content_management import Content
 TOPIC_DICT = Content()
 
-app.web_app.setMinimumWidth(300)
-app.web_app.setMinimumHeight(500)
+app.web_app.setMinimumWidth(480)
+app.web_app.setMinimumHeight(650)
 
 # app.window.setWindowFlags(PySide.QtCore.Qt.FramelessWindowHint)
 # app.window.setWindowFlags(PySide.QtCore.Qt.WindowFullScreen)
@@ -37,14 +37,16 @@ app.web_app.setMinimumHeight(500)
 #app.window.setWindowIcon(QtGui.QIcon(BASE_DIR + "/static/img/icon.png"))
 
 # app.template = ("index.html", TOPIC_DICT)
-app.template = ("enroll.html", TOPIC_DICT)
+app.template = ("home.html", TOPIC_DICT)
 
 # # Binding of back-end functionalities with GUI
 # Import back-end functionalities
-from backend_code import enroll
+from backend_code import enroll , attendance , routing
 
 # Register back-end functionalities
 app.bind(enroll(app))
+app.bind(attendance(app))
+app.bind(routing(app))
 
 
 # Instructions for running application

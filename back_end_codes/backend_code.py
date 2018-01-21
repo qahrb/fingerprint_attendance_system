@@ -1,5 +1,6 @@
 import json
 import PySide.QtCore as q
+import PySide.QtWebKit as w
 
 import requests
 import htmlPy
@@ -97,24 +98,35 @@ class enroll(htmlPy.Object):
         self.finger= f()
         #getting the first scan of a fingerprint.
         if(self.finger.get_finger_template_first() == -1):
-            self.app_gui.template = ("./enroll.html", {"errors": [" Please try putting your fingers better :) "]})
+            self.app_gui.template = ("./enroll.html", {"errors": [" Please try putting your finger better :) "]})
+        
         #alerting the user to remove his finger
-        
-        print self.app_gui.evaluate_javascript("myFunction();")
-        
         # most important thing in the code
-        die_time=q.QTime.currentTime().addSecs(5)
+        self.app_gui.evaluate_javascript("myFunction1();")
+
+        die_time=q.QTime.currentTime().addSecs(3)
+        while q.QTime.currentTime() < die_time:
+            q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
+        
+        time.sleep(3)
+        def h():
+            print "hello world"
+
+        # this function waits for change to happen in the url to stop further progress in the function
+        if self.app_gui.web_app.urlChanged:
+            return
+        
+        #alerting the user to remove his finger
+        # most important thing in the code
+        self.app_gui.evaluate_javascript("myFunction2();")
+
+        die_time=q.QTime.currentTime().addSecs(1)
         while q.QTime.currentTime() < die_time:
             q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
 
-       
-        
-        time.sleep(3)
-        #print self.app_gui.evaluate_javascript("alert('Hello from back-end')")
-        #self.app_gui.evaluate_javascript('setTimeout(function(){ document.getElementById("demo").innerHTML = "Hello World!"; },500);')
-        self.app_gui.execute()
+        if self.app_gui.web_app.urlChanged:
+            return
 
-        time.sleep(3)
         list=self.finger.get_finger_template_final()
         print "this is the list contents"
         print list
@@ -145,13 +157,13 @@ class enroll(htmlPy.Object):
 
         hello=r.json()
                              ##################################       
-        # if( hello["message"] == "finger Print was recorded." ):
-        #     self.app_gui.template =  ("./enroll.html", {"successes": [" Fingerprint registered sucessfully "]})
-        #     return
-        # else:
-        #     self.app_gui.template = ("./enroll.html", {"errors": [" Some errors on the server side occured.<br>Please try again later."]})
+        if( hello["message"] == "finger Print was recorded." ):
+            self.app_gui.template =  ("./enroll.html", {"successes": [" Fingerprint registered sucessfully "]})
+            return
+        else:
+            self.app_gui.template = ("./enroll.html", {"errors": [" Some errors on the server side occured.<br>Please try again later."]})
 
-        # return 
+        return 
 
 ########################################################################################################################
 ########################################################################################################################
@@ -167,6 +179,8 @@ class attendance(htmlPy.Object):
         self.current_attendance=None
         self.current_time=None
         self.lecture_time=None
+        self.url="http://localhost/api/student/attendance.php"
+        self.test = 0
         # Initialize the class here, if required.
         return
 
@@ -225,51 +239,114 @@ class attendance(htmlPy.Object):
 
 ########################################################################################################################
 
+    import json
+import PySide.QtCore as q
+import PySide.QtWebKit as w
+import requests
+import htmlPy
+from fingerprint import fingerprint as f
+import time
+import datetime
+from ast import literal_eval
+
+class attendance(htmlPy.Object):
+    
+    def __init__(self,app_gui):
+        super(attendance, self).__init__()
+        self.app_gui = app_gui
+        self.token= None
+        self.lectures_array= None
+        self.admins_array=None
+        self.current_attendance=None
+        self.current_time=None
+        self.lecture_time=None
+        self.today=None
+        self.url="http://localhost/api/student/attendance.php"
+        self.start = 0
+        self.lectures_array_edited=[]
+        self.time_for_lecture=0
+        # Initialize the class here, if required.
+        return
+
     @htmlPy.Slot()
     def attendance_main(self):
-        url="http://localhost/api/student/attendance.php"
-        time =None
-        #get the time in alphabetical form
-        today = datetime.datetime.now()
-
         ###############################
-        ###############################
-        ###############################
-        ###############################
-        # please edit this part for saturdays and sundays
-        #js = {"day":today.strftime("%a"),"location":"CMPE001"}
-        js = {"day":"MON","location":"CMPE001"}
-        ###############################
-        ###############################
-        ###############################
-
-        # print js["day"]
-        #try getting the data from the server
-        # try:
-            #The following is the request to get attendance data for today
-        self.current_attendance = requests.post(url, json.dumps(js))
-        self.current_attendance = json.loads(self.current_attendance.content)
-        # print self.current_attendance
-        self.lectures_array= self.current_attendance["records"]
-        self.current_time =datetime.datetime.now()
-        ###############################
-        for lecture in self.lectures_array:
-
-            for key in lecture.keys():
-                # print key
-                if(key != u"instrcutors"):
-                    
-                    time= key
-
-            # remove the colon from the time unicode string
-            time=time.replace(":","")
-            # time is in unicode
-            # this line changes time from unicode to ascii
-            time=time.encode('ascii','ignore')
+        if not self.start:
+            self.start=1
+            #get the time in alphabetical form
+            self.today = datetime.datetime.now()
             
-            
-            self.lectures_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
-            print self.lectures_time
+            ###############################
+            # please edit this part for saturdays and sundays
+            #js = {"day":today.strftime("%a"),"location":"CMPE001"}
+            js = {"day":"MON","location":"CMPE001"}
+            ###############################
+            # try:
+                #The following is the request to get attendance data for today
+            self.current_attendance = requests.post(self.url, json.dumps(js))
+            self.current_attendance = json.loads(self.current_attendance.content)
+            # print self.current_attendance
+            self.lectures_array= self.current_attendance["records"]
+            for lecture in self.lectures_array:
+                self.current_time = datetime.datetime.now()
+                for key in lecture.keys():
+                    if(key != u"instrcutors"):
+                        time= key
+                        # remove the colon from the time unicode string
+                        time=time.replace(":","")
+                        # time is in unicode
+                        # this line changes time from unicode to ascii
+                        time=time.encode('ascii','ignore')
+                        # put the recieved time in the time format needed
+                        self.lecture_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
+                        self.lectures_array_edited.append(self.lecture_time)
+
+        ###############################
+        self.today = datetime.datetime.now().day
+        if self.today != datetime.datetime.now().day:
+            self.today = datetime.datetime.now()
+            # js = {"day":self.today.strftime("%a"),"location":"CMPE001"}
+            js = {"day":"MON","location":"CMPE001"}
+            self.current_attendance = requests.post(self.url, json.dumps(js))
+            self.current_attendance = json.loads(self.current_attendance.content)
+            self.lectures_array= self.current_attendance["records"]
+            for lecture in self.lectures_array:
+                self.current_time = datetime.datetime.now()
+                for key in lecture.keys():
+                    if(key != u"instrcutors"):
+                        time= key
+                        time=time.replace(":","")
+                        time=time.encode('ascii','ignore')
+                        self.lecture_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
+                        self.lectures_array_edited.append(self.lecture_time)
+
+        self.current_time = datetime.datetime.now()
+        # for the time being
+        self.current_time= self.current_time.replace(hour=11)
+        for lecture in self.lectures_array_edited:
+            if self.current_time >= lecture   and self.current_time <= (lecture + datetime.timedelta(hours=2) ):
+                self.time_for_lecture=1
+                self.lecture_time= lecture
+                break
+            else:
+                self.time_for_lecture=0
+
+        if self.time_for_lecture:
+            print "hello"
+        else:
+            return    
+        
+        ###############################
+        
+        
+
+                    # print self.lecture_time
+                    # print "###"
+                    # self.current_time= self.current_time.replace(hour=8)
+                    # print "###"
+                    # print self.lecture_time + datetime.timedelta(hours=2)
+                    # if self.current_time >= self.lecture_time   and self.current_time <= (self.lecture_time + datetime.timedelta(hours=2) ):
+                    #     print "kak"
         ###############################
         # except Exception:
         #     self.app_gui.template = ("./attendance/admin_scan.html", {"errors": ["Server down :(. Try again later. "]})

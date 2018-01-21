@@ -1,8 +1,11 @@
 {% extends "header.html" %} {% block body %}
 
 <script>
-    function myFunction() {
-        document.getElementById("demo").innerHTML="hi"; // The function returns the product of p1 and p2
+    function myFunction1() {
+        document.getElementById("3").innerHTML="remove your finger"; // The function returns the product of p1 and p2
+    }
+    function myFunction2() {
+        document.getElementById("4").innerHTML="put your finger again"; // The function returns the product of p1 and p2
     }
 </script>
 
@@ -14,12 +17,12 @@
 </div>
 
 <div class="row">
-    <div class=" col-sm-offset-4 col-sm-4 ">
-        <br>1. Click on the button.
-        <br>2. Ask the student to put his finger on the button.
-        <br>3. Ask him/her to remove there finger after a second.
-        <br>4. Ask him/her to put their finger back when sensor lights again.
-        <br>5. Ask them to remove their finger at last.
+    <div class=" col-sm-offset-4 col-sm-4 text-center">
+        <div id="1">Click on the button</div>
+        <div id="2">Ask the student to put his finger on the button</div>
+        <div id="3"></div>
+        <div id="4"></div>
+        
 
         <a class=" text-center" href="enroll.register" id="link" data-bind="true">
             <br> scan
@@ -34,6 +37,5 @@
     </div>
 </div>
 
-<div id="demo">he</div>
 
 {% endblock %}

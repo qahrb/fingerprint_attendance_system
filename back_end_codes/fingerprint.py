@@ -3,6 +3,7 @@ import sys
 import glob
 import time
 from pyfingerprint.pyfingerprint import PyFingerprint as p
+from interruptingcow import timeout
 
 class fingerprint():
 
@@ -97,6 +98,66 @@ class fingerprint():
             else:
                 return 1
 
+        except Exception as e:
+                    print('Operation failed!')
+                    print('Exception message: ' + str(e))
+                    return -1
+
+    def template_add(self, fingerprint_template = []):
+
+        try:
+            ## Gets some sensor information
+            print('Currently used templates: ' + str(self.f.getTemplateCount()) +'/'+ str(self.f.getStorageCapacity()))
+
+            # self.f.clearDatabase()
+            for finger in fingerprint_template:
+                self.f.uploadCharacteristics(0x01,finger)
+                self.f.uploadCharacteristics(0x02,finger)
+                self.f.createTemplate()
+                positionNumber = self.f.storeTemplate()
+                print positionNumber
+            ## Gets some sensor information
+            print('Currently used templates: ' + str(self.f.getTemplateCount()) +'/'+ str(self.f.getStorageCapacity()))
+            return "okay"
+        except Exception as e:
+                    print('Operation failed!')
+                    print('Exception message: ' + str(e))
+                    return -1
+    
+    def admin_scan(self):
+
+        try:
+            print('Waiting for finger...')
+
+            while True:
+                try:
+                    with timeout(5, exception=RuntimeError):
+                        # perform a potentially very slow operation
+                        while ( self.f.readImage() == False):
+                            # break
+                            pass
+                        break   
+                except RuntimeError:
+                    pass
+                    return "no one"
+                    break
+
+            ## Converts read image to characteristics and stores it in charbuffer 1
+            self.f.convertImage(0x01)
+
+            ## Searchs template
+            result = self.f.searchTemplate()
+
+            positionNumber = result[0]
+            accuracyScore = result[1]
+
+            if ( positionNumber == -1 ):
+                print('No match found!')
+                return -1
+            else:
+                print('Found template at position #' + str(positionNumber))
+                print('The accuracy score is: ' + str(accuracyScore))
+                return positionNumber
         except Exception as e:
                     print('Operation failed!')
                     print('Exception message: ' + str(e))

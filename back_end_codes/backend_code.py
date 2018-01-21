@@ -109,12 +109,11 @@ class enroll(htmlPy.Object):
             q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
         
         time.sleep(3)
-        def h():
-            print "hello world"
+        
 
         # this function waits for change to happen in the url to stop further progress in the function
-        if self.app_gui.web_app.urlChanged:
-            return
+        # if self.app_gui.web_app.urlChanged:
+        #     return
         
         #alerting the user to remove his finger
         # most important thing in the code
@@ -124,8 +123,8 @@ class enroll(htmlPy.Object):
         while q.QTime.currentTime() < die_time:
             q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
 
-        if self.app_gui.web_app.urlChanged:
-            return
+        # if self.app_gui.web_app.urlChanged:
+        #     return
 
         list=self.finger.get_finger_template_final()
         print "this is the list contents"
@@ -239,15 +238,6 @@ class attendance(htmlPy.Object):
 
 ########################################################################################################################
 
-    import json
-import PySide.QtCore as q
-import PySide.QtWebKit as w
-import requests
-import htmlPy
-from fingerprint import fingerprint as f
-import time
-import datetime
-from ast import literal_eval
 
 class attendance(htmlPy.Object):
     
@@ -257,6 +247,7 @@ class attendance(htmlPy.Object):
         self.token= None
         self.lectures_array= None
         self.admins_array=None
+        self.admins_fingers=[]
         self.current_attendance=None
         self.current_time=None
         self.lecture_time=None
@@ -265,11 +256,21 @@ class attendance(htmlPy.Object):
         self.start = 0
         self.lectures_array_edited=[]
         self.time_for_lecture=0
+        self.unedited_lecture_time=None
+        self.finger= None
+        self.students_array=[]
+        self.students_fingers=[]
+        self.add_template_flag=0
+        self.attended=[]
+        self.admin_scan_flag=0
         # Initialize the class here, if required.
         return
 
     @htmlPy.Slot()
     def attendance_main(self):
+        self.add_template_flag=0
+        self.time_for_lecture=0
+        self.today = datetime.datetime.now().day
         ###############################
         if not self.start:
             self.start=1
@@ -292,18 +293,25 @@ class attendance(htmlPy.Object):
                 for key in lecture.keys():
                     if(key != u"instrcutors"):
                         time= key
-                        # remove the colon from the time unicode string
+                        self.unedited_lecture_time=time
                         time=time.replace(":","")
-                        # time is in unicode
-                        # this line changes time from unicode to ascii
                         time=time.encode('ascii','ignore')
-                        # put the recieved time in the time format needed
                         self.lecture_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
-                        self.lectures_array_edited.append(self.lecture_time)
+                        self.current_time = datetime.datetime.now()
+                        #remove the following line when finishing
+                        self.current_time= self.current_time.replace(hour=22)
+                        if self.current_time >= self.lecture_time   and self.current_time <= (self.lecture_time + datetime.timedelta(hours=2) ):
+                            self.time_for_lecture=1
+                            # self.lecture_time= lecture
+                            break
+                        else:
+                            self.time_for_lecture=0
+                if self.time_for_lecture:
+                    break
 
         ###############################
-        self.today = datetime.datetime.now().day
-        if self.today != datetime.datetime.now().day:
+        
+        elif self.today != datetime.datetime.now().day:
             self.today = datetime.datetime.now()
             # js = {"day":self.today.strftime("%a"),"location":"CMPE001"}
             js = {"day":"MON","location":"CMPE001"}
@@ -315,25 +323,108 @@ class attendance(htmlPy.Object):
                 for key in lecture.keys():
                     if(key != u"instrcutors"):
                         time= key
+                        self.unedited_lecture_time=time
                         time=time.replace(":","")
                         time=time.encode('ascii','ignore')
                         self.lecture_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
-                        self.lectures_array_edited.append(self.lecture_time)
+                        self.current_time = datetime.datetime.now()
+                        #remove the following line when finishing
+                        self.current_time= self.current_time.replace(hour=11)
+                        if self.current_time >= self.lecture_time   and self.current_time <= (self.lecture_time + datetime.timedelta(hours=2) ):
+                            self.time_for_lecture=1
+                            # self.lecture_time= lecture
+                            break
+                        else:
+                            self.time_for_lecture=0
+                if self.time_for_lecture:
+                    break
+        else:
+            for lecture in self.lectures_array:
+                self.current_time = datetime.datetime.now()
+                for key in lecture.keys():
+                    if(key != u"instrcutors"):
+                        time= key
+                        self.unedited_lecture_time=time
+                        time=time.replace(":","")
+                        time=time.encode('ascii','ignore')
+                        self.lecture_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
+                        self.current_time = datetime.datetime.now()
+                        #remove the following line when finishing
+                        self.current_time= self.current_time.replace(hour=11)
+                        if self.current_time >= self.lecture_time   and self.current_time <= (self.lecture_time + datetime.timedelta(hours=2) ):
+                            self.time_for_lecture=1
+                            print "choco"
+                            # self.lecture_time= lecture
+                            break
+                        else:
+                            self.time_for_lecture=0
+                if self.time_for_lecture:
+                    break
 
-        self.current_time = datetime.datetime.now()
-        # for the time being
-        self.current_time= self.current_time.replace(hour=11)
-        for lecture in self.lectures_array_edited:
-            if self.current_time >= lecture   and self.current_time <= (lecture + datetime.timedelta(hours=2) ):
-                self.time_for_lecture=1
-                self.lecture_time= lecture
-                break
-            else:
-                self.time_for_lecture=0
+        # self.current_time = datetime.datetime.now()
+        # # for the time being
+        # self.current_time= self.current_time.replace(hour=11)
+        # for lecture in self.lectures_array_edited:
+        #     if self.current_time >= lecture   and self.current_time <= (lecture + datetime.timedelta(hours=2) ):
+        #         self.time_for_lecture=1
+        #         self.lecture_time= lecture
+        #         break
+        #     else:
+        #         self.time_for_lecture=0
 
         if self.time_for_lecture:
-            print "hello"
+            self.admins_fingers=[]
+            # x= str(self.lecture_time.hour) +":"+ str(self.lecture_time.minute)
+            # print self.lectures_array
+            # print self.current_attendance
+            # get the instructors array from the lecture
+            inst=""
+            i=0
+            # print self.unedited_lecture_time
+            # print self.current_attendance["admins"]
+            for lecture in self.current_attendance["records"]:
+                for key in lecture:
+                    if key == self.unedited_lecture_time:
+                        print key
+                        inst= self.current_attendance["records"][i]["instrcutors"]
+                i+=1
+            # print inst
+
+            # get the admins array
+            self.admins_array=self.current_attendance["admins"]+inst
+
+            for admin in self.admins_array:
+                # print type(admin["fingerPrint"][0])
+                temp=literal_eval(admin["fingerPrint"])
+                # print type(temp)
+                # print type(temp[0])
+                self.admins_fingers.append(temp)
+            
+            # for finger in self.admins_fingers:
+            #     print finger
+            if not self.admin_scan_flag:
+                self.finger=f()
+                self.finger.f.clearDatabase()
+                temp=self.finger.template_add(self.admins_fingers)
+                print temp
+                self.admin_scan_flag=1
+
+            temp=self.finger.admin_scan()
+            print temp
+            print len(self.admins_fingers)-1
+            if temp >=0 and temp <= len(self.admins_fingers)-1:
+                self.app_gui.template= ("./attendance/student_scan.html",{})
+            elif temp== -1:
+                self.app_gui.template= ("./attendance/admin_scan.html",{"errors":["No match for the fingerprint given "]})
+            else:
+                self.app_gui.template= ("./attendance/admin_scan.html",{})
+            
         else:
+            self.app_gui.evaluate_javascript("myFunction1();")
+            self.admin_scan_flag=0
+            die_time=q.QTime.currentTime().addSecs(3)
+            while q.QTime.currentTime() < die_time:
+                q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
             return    
         
         ###############################
@@ -351,7 +442,74 @@ class attendance(htmlPy.Object):
         # except Exception:
         #     self.app_gui.template = ("./attendance/admin_scan.html", {"errors": ["Server down :(. Try again later. "]})
             
+    @htmlPy.Slot()
+    def student_scan(self):
+        print "hi student"
+        self.admin_scan_flag=0
+        self.current_time = datetime.datetime.now()
+        #remove the following line when finishing
+        self.current_time= self.current_time.replace(hour=11)
+
+        if not(self.current_time >= self.lecture_time   and self.current_time <= (self.lecture_time + datetime.timedelta(hours=2) )):
+            self.app_gui.template= ("./attendance/admin_scan.html",{"errors":["Time finished"]})
+            return
+        if not self.add_template_flag:
+            i=0
+            self.students_fingers=[]
+            for lecture in self.current_attendance["records"]:
+                    for key in lecture:
+                        if key == self.unedited_lecture_time:
+                            print key
+                            inst= self.current_attendance["records"][i][self.unedited_lecture_time]
+                    i+=1
+            self.students_array=inst
+            # for student in self.students_array:
+            #     print student
+            for student in self.students_array:
+                    # print type(admin["fingerPrint"][0])
+                    print type(student["fingerPrint"])
+                    temp=literal_eval(student["fingerPrint"])
+                    # print type(temp)
+                    # print type(temp[0])
+                    self.students_fingers.append(temp)
+
+            
+            self.finger.template_add(self.students_fingers)
+            self.add_template_flag=1
+            self.attended=[0]*len(self.students_fingers)
+            for i in self.attended:
+                print i
+
+        time.sleep(0.5)
+        temp=self.finger.admin_scan()
+        print temp
+        check_array= self.admins_array + self.students_array
         
+        if temp >=0 and temp <= len(self.admins_fingers)-1:
+                self.app_gui.template= ("./attendance/admin_scan.html",{"successes":["attendance ended"]})
+                return
+        elif temp > len(self.admins_fingers)-1 and temp <= (len(self.admins_fingers)+len(self.students_fingers))-1:
+            # attendance taking part
+            print "hi"
+            datetime.datetime
+            # print check_array[temp]
+            date= str(datetime.datetime.now())[0:10]
+
+            timee= str(datetime.datetime.now().time())[0:5]
+
+            dic={"Sid":check_array[temp]["id"],"Cid":check_array[temp]["course_id"],"att":"1","t":timee,"d":date}
+            url="http://localhost/api/student/write_single_json_input.php"
+            r=requests.post(url,json.dumps(dic))
+            print r.content
+            self.app_gui.template= ("./attendance/student_scan.html",{"successes":["thank you"+check_array[temp]["name"]]})
+            
+            return
+        elif temp== -1:
+            self.app_gui.template= ("./attendance/student_scan.html",{"errors":["No match for the fingerprint given "]})
+            return
+        else:
+            self.app_gui.template= ("./attendance/student_scan.html",{})
+            return
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################

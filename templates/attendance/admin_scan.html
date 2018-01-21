@@ -3,15 +3,17 @@
 
 <script>
     setTimeout(function(){attendance.attendance_main() },500);
+    function myFunction1() {
+        document.getElementById("demo").innerHTML="no lecture right now"; // The function returns the product of p1 and p2
+        setTimeout(function(){attendance.attendance_main() },4000);
+    }
+    function myFunction2() {
+        document.getElementById("show").innerHTML="<h4>An admin finger print is needed to open the attendance <br> Please click on the scanner to start scanning</h4>"; // The function returns the product of p1 and p2
+        setTimeout(function(){attendance.attendance_main() },4000);}
 </script>
 
 <div class="row">
-    <div class="col-md12 text-center">
-        <h4>
-            An admin finger print is needed to open the attendance
-            <br> Please click on the scanner to start scanning
-        </h4>
-        
+    <div id="show" class="col-md12 text-center">
     </div>
 </div>
 <div class="row ">
@@ -21,6 +23,6 @@
     </div>
 </div>
 
-<div id="demo"></div>
+<div id="demo" class="text-center"></div>
 
 {% endblock %}

@@ -1,17 +1,17 @@
 {% extends "header.html" %} {% block body %}
 
-
+<script>
+    setTimeout(function(){attendance.student_scan() },500);
+</script>
 
 
 <div class="row">
     <div class="col-md12 text-center">
         <h4>
             If you are a student please scan your finger
-            <br> after clicking on the button
+            
         </h4>
-        <a class=" text-center" id="clickk" href="attendance.attendance_main" id="link" data-bind="true">
-            <br> scan
-        </a>
+
     </div>
 </div>
 <div class="row ">

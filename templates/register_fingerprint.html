@@ -1,10 +1,14 @@
 {% extends "header.html" %} {% block body %}
 
-
+<script>
+    function myFunction() {
+        document.getElementById("demo").innerHTML="hi"; // The function returns the product of p1 and p2
+    }
+</script>
 
 <div class="row text-center">
     <div class="col-sm-12">
-        Id : {{id}}
+        Id : {{student_id}}
         <br> Name : {{name}}
     </div>
 </div>
@@ -16,9 +20,11 @@
         <br>3. Ask him/her to remove there finger after a second.
         <br>4. Ask him/her to put their finger back when sensor lights again.
         <br>5. Ask them to remove their finger at last.
-        <a class=" text-center"href="enroll.register" id="link" data-bind="true">
-            <br> scan 
+
+        <a class=" text-center" href="enroll.register" id="link" data-bind="true">
+            <br> scan
         </a>
+
     </div>
 </div>
 
@@ -27,5 +33,7 @@
 
     </div>
 </div>
+
+<div id="demo">he</div>
 
 {% endblock %}

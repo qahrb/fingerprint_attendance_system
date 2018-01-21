@@ -1,9 +1,13 @@
 import json
+import PySide.QtCore as q
+
 import requests
 import htmlPy
 from fingerprint import fingerprint as f
 import time
+import datetime
 from ast import literal_eval
+
 
 ########################################################################################################################
 ########################################################################################################################
@@ -19,7 +23,6 @@ class enroll(htmlPy.Object):
         self.token= None
         # Initialize the class here, if required.
         return
-
 
 ########################################################################################################################
 
@@ -57,28 +60,33 @@ class enroll(htmlPy.Object):
         form_data = json.loads(json_data)
         #this print the student id given by the client through the api
         print (json.dumps(form_data))
-
-        if(form_data['student_id']==None):
+        
+        if(form_data['student_id']== u''):
             self.app_gui.template = ("./enroll.html", {"errors": [" Please enter a student id "]})
+            return
 
         try:
             #The following is the request to check if this student is already enrolled or no
             r = requests.post(url, data = json.dumps(form_data))
+
+            self.hello=r.json()
+            print self.hello
+            if( self.hello["message"] == None):
+
+                if( self.hello["fingerprint_template"]== None ):
+                    self.app_gui.template = ("./register_fingerprint.html", self.hello)
+                    return
+                else:
+                    self.app_gui.template = ("./enroll.html", {"errors": [" This student is already registered. "]})
+                    return
+
+            else:
+                self.app_gui.template = ("./enroll.html", {"errors": [" The Student Id you entered is wrong. Please enter a correct one"]})
+                return
         except Exception:
             self.app_gui.template = ("./enroll.html", {"errors": ["Server down :(. Try again later. "]})
-            
-        self.hello=r.json()
-        print self.hello
-        if( self.hello["message"] == None):
+            return
 
-            if( self.hello["fingerprint_template"]== None ):
-                self.app_gui.template = ("./register_fingerprint.html", self.hello)
-            else:
-                self.app_gui.template = ("./enroll.html", {"errors": [" This student is already registered. "]})
-
-        else:
-            self.app_gui.template = ("./enroll.html", {"errors": [" The Student Id you entered is wrong. Please enter a correct one"]})
-        
 ########################################################################################################################
 
     @htmlPy.Slot()
@@ -91,14 +99,33 @@ class enroll(htmlPy.Object):
         if(self.finger.get_finger_template_first() == -1):
             self.app_gui.template = ("./enroll.html", {"errors": [" Please try putting your fingers better :) "]})
         #alerting the user to remove his finger
+        
+        print self.app_gui.evaluate_javascript("myFunction();")
+        
+        # most important thing in the code
+        die_time=q.QTime.currentTime().addSecs(5)
+        while q.QTime.currentTime() < die_time:
+            q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
+
+       
+        
+        time.sleep(3)
+        #print self.app_gui.evaluate_javascript("alert('Hello from back-end')")
+        #self.app_gui.evaluate_javascript('setTimeout(function(){ document.getElementById("demo").innerHTML = "Hello World!"; },500);')
+        self.app_gui.execute()
+
         time.sleep(3)
         list=self.finger.get_finger_template_final()
+        print "this is the list contents"
+        print list
         #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
         if(list==0):
             self.app_gui.template = ("./enroll.html", {"errors": [" Fingers doesn't match :) "]})
+            return
         # this means that there had been an unknown problem
         if(list== -1):
             self.app_gui.template = ("./enroll.html", {"errors": [" sorry there had been a problem :) "]})
+            return
                             ##################################
         #in the following the list is being added to a dictionary function so it can be sended as a json string to the server
         # print list
@@ -113,16 +140,18 @@ class enroll(htmlPy.Object):
             r = requests.post(url, data = json.dumps(z))
         except Exception:
             self.app_gui.template = ("./enroll.html", {"errors": ["Server down :( . Try again later. "]})
+            return
         print r.content
 
         hello=r.json()
                              ##################################       
-        if( hello["message"] == "finger Print was recorded." ):
-            self.app_gui.template =  ("./enroll.html", {"successes": [" Fingerprint registered sucessfully "]})
-        else:
-            self.app_gui.template = ("./enroll.html", {"errors": [" Some errors on the server side occured.<br>Please try again later."]})
+        # if( hello["message"] == "finger Print was recorded." ):
+        #     self.app_gui.template =  ("./enroll.html", {"successes": [" Fingerprint registered sucessfully "]})
+        #     return
+        # else:
+        #     self.app_gui.template = ("./enroll.html", {"errors": [" Some errors on the server side occured.<br>Please try again later."]})
 
-        return 
+        # return 
 
 ########################################################################################################################
 ########################################################################################################################
@@ -133,8 +162,15 @@ class attendance(htmlPy.Object):
         super(attendance, self).__init__()
         self.app_gui = app_gui
         self.token= None
+        self.lectures_array= None
+        self.admins_array=None
+        self.current_attendance=None
+        self.current_time=None
+        self.lecture_time=None
         # Initialize the class here, if required.
         return
+
+########################################################################################################################
 
     @htmlPy.Slot(str, result=str)
     def test(self, json_data):
@@ -172,17 +208,73 @@ class attendance(htmlPy.Object):
                 #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
                 if(test==1):
                     self.app_gui.template= ("./test.html",{"successes":["Yay it works!!! :) "]})
+                    return
                 if(test==0):
                     self.app_gui.template = ("./test.html", {"errors": [" Fingers doesn't match :)<br>Try licking your finger"]})
+                    return
                 # this means that there had been an unknown problem
                 if(test== -1):
                     self.app_gui.template = ("./test.html", {"errors": [" sorry there had been a problem :) "]})
+                    return
 
             
 
         else:
             self.app_gui.template = ("./enroll.html", {"errors": [" The Student Id you entered is wrong. Please enter a correct one"]})
+            return
 
+########################################################################################################################
+
+    @htmlPy.Slot()
+    def attendance_main(self):
+        url="http://localhost/api/student/attendance.php"
+        time =None
+        #get the time in alphabetical form
+        today = datetime.datetime.now()
+
+        ###############################
+        ###############################
+        ###############################
+        ###############################
+        # please edit this part for saturdays and sundays
+        #js = {"day":today.strftime("%a"),"location":"CMPE001"}
+        js = {"day":"MON","location":"CMPE001"}
+        ###############################
+        ###############################
+        ###############################
+
+        # print js["day"]
+        #try getting the data from the server
+        # try:
+            #The following is the request to get attendance data for today
+        self.current_attendance = requests.post(url, json.dumps(js))
+        self.current_attendance = json.loads(self.current_attendance.content)
+        # print self.current_attendance
+        self.lectures_array= self.current_attendance["records"]
+        self.current_time =datetime.datetime.now()
+        ###############################
+        for lecture in self.lectures_array:
+
+            for key in lecture.keys():
+                # print key
+                if(key != u"instrcutors"):
+                    
+                    time= key
+
+            # remove the colon from the time unicode string
+            time=time.replace(":","")
+            # time is in unicode
+            # this line changes time from unicode to ascii
+            time=time.encode('ascii','ignore')
+            
+            
+            self.lectures_time = self.current_time.replace(hour=int(time[0:2]), minute=int(time[3:5]))
+            print self.lectures_time
+        ###############################
+        # except Exception:
+        #     self.app_gui.template = ("./attendance/admin_scan.html", {"errors": ["Server down :(. Try again later. "]})
+            
+        
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -208,7 +300,7 @@ class routing(htmlPy.Object):
             self.app_gui.template = ("./enroll.html", { })
 
         if(form_data['route']=="attendance"):
-            self.app_gui.template = ("./attendance.html", { })
+            self.app_gui.template = ("./attendance/admin_scan.html", { })
 
         if(form_data['route']=="test"):
             self.app_gui.template = ("./test.html", { })

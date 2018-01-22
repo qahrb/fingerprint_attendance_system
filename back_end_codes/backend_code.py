@@ -175,7 +175,7 @@ class attendancee(htmlPy.Object):
         self.token= None
         # Initialize the class here, if required.
         return
-
+########################################################################################################################
     @htmlPy.Slot(str, result=str)
     def test(self, json_data):
         url="http://localhost/api/student/enroll_find_student_fingerprint.php"
@@ -384,10 +384,15 @@ class attendance(htmlPy.Object):
 
             for admin in self.admins_array:
                 # print type(admin["fingerPrint"][0])
-                temp=literal_eval(admin["fingerPrint"])
+                if(admin["fingerPrint"]== None):
+                    temp=[0]*512
+                    self.admins_fingers.append(temp)
+                else:
+                    temp=literal_eval(admin["fingerPrint"])
                 # print type(temp)
                 # print type(temp[0])
-                self.admins_fingers.append(temp)
+                    self.admins_fingers.append(temp)
+                print temp
             
             # for finger in self.admins_fingers:
             #     print finger
@@ -455,12 +460,19 @@ class attendance(htmlPy.Object):
             # for student in self.students_array:
             #     print student
             for student in self.students_array:
-                    # print type(admin["fingerPrint"][0])
-                    print type(student["fingerPrint"])
-                    temp=literal_eval(student["fingerPrint"])
-                    # print type(temp)
-                    # print type(temp[0])
+                # print type(admin["fingerPrint"][0])
+                if(student["fingerPrint"]== None):
+                    temp=[0]*512
                     self.students_fingers.append(temp)
+                else:
+                    temp=literal_eval(student["fingerPrint"])
+                    self.students_fingers.append(temp)
+                # print type(temp)
+                # print type(temp[0])
+                
+
+            
+                
 
             
             self.finger.template_add(self.students_fingers)
@@ -549,3 +561,100 @@ class routing(htmlPy.Object):
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
+
+class exam(htmlPy.Object):
+
+    def __init__(self,app_gui):
+
+        super(exam,self).__init__()
+        self.app_gui=app_gui
+        self.url="http://localhost/api/student/read_exam_list.php"
+        self.post_url="http://localhost/api/student/write_single_json_input.php"
+        self.student_list=None
+        self.students_array=None
+        self.student_template_flag=0
+        self.students_fingers=[]
+        self.finger=[]
+        self.course_id=None
+        return
+
+
+    @htmlPy.Slot(str, result=str)
+    def get_course_students(self,json_data):
+        self.students_fingers=[]
+        self.student_template_flag=0
+        form_data = json.loads(json_data)
+        print json.dumps(form_data)
+        self.course_id=form_data["course"]
+        if(form_data['course']== u''):
+            self.app_gui.template = ("./exam_code.html", {"errors": [" Please enter a student id "]})
+            return
+
+        print json.dumps(form_data)
+
+        try:
+            #The following is the request to check if this student is already enrolled or no
+            r = requests.post(self.url, data = json.dumps(form_data))
+
+            self.student_list=r.json()
+                
+            if( not self.student_list["records"] ):
+
+                self.app_gui.template = ("./exam/exam_code.html", {"errors": [" There is no course by this number"]})
+                return
+                
+            else:
+                self.students_array=self.student_list["records"]
+                for i in self.students_array:
+                    print i
+                    print "\n"
+                self.app_gui.template = ("./exam/exam_student_scan.html", {})
+        except Exception:
+            self.app_gui.template = ("./exam/exam_code.html", {"errors": ["course code is wrong "]})
+            return
+
+    @htmlPy.Slot()
+    def examm_student_scan(self):
+        print "hello student who is taking the exam"
+        if not self.student_template_flag:
+            self.student_template_flag=1
+
+            for student in self.students_array:
+                temp=literal_eval(student["fingerPrint"])
+                print temp
+                print type(temp)
+                self.students_fingers.append(temp)
+
+            self.finger=f()
+            self.finger.f.clearDatabase()
+            self.finger.template_add(self.students_fingers)
+
+        time.sleep(0.5)
+
+        temp=self.finger.admin_scan()
+        print temp
+        
+        if temp >=0 and temp <= len(self.students_fingers)-1:
+            print "hi"
+            
+            # print check_array[temp]
+            date= str(datetime.datetime.now())[0:10]
+
+            timee= str(datetime.datetime.now().time())[0:5]
+
+            dic={"Sid":self.students_array[temp]["id"],"Cid":self.course_id,"att":"1","t":timee,"d":date}
+            print dic
+            url="http://localhost/api/student/write_single_json_input.php"
+            r=requests.post(url,json.dumps(dic))
+            print r.content
+            self.app_gui.template= ("./exam/exam_student_scan.html",{"successes":["thank you"+self.students_array[temp]["name"]]})
+            
+            return
+        elif temp== -1:
+            self.app_gui.template= ("./exam/exam_student_scan.html",{"errors":["No match for the fingerprint given "]})
+            return
+        else:
+            self.app_gui.template= ("./exam/exam_student_scan.html",{})
+            return
+
+         

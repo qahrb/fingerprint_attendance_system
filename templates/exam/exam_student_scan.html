@@ -1,0 +1,32 @@
+{% extends "header.html" %} {% block body %}
+
+<!-- The following is the student_id submission field to check if he is enrolled or no -->
+
+<script>
+        setTimeout(function(){exam.examm_student_scan() },1000);
+</script>
+    
+    
+    <div class="row">
+            <div id="show" class="col-md12 text-center">
+                <h2>Student Scan</h2>
+            </div>
+        </div>
+    
+    
+    <div class="row ">
+        <div class="col-sm-offset-4 col-sm-4">
+            <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/finger.jpg'|staticfile}}"
+                alt="finger">
+        </div>
+    </div>
+    <div class="row">
+            <div class="col-md12 text-center">
+                <h4>
+                    If you are a student please scan your finger
+                    
+                </h4>
+        
+            </div>
+        </div>
+{% endblock %}

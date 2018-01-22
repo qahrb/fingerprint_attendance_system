@@ -104,7 +104,7 @@ class enroll(htmlPy.Object):
         # most important thing in the code
         self.app_gui.evaluate_javascript("myFunction1();")
 
-        die_time=q.QTime.currentTime().addSecs(3)
+        die_time=q.QTime.currentTime().addSecs(1)
         while q.QTime.currentTime() < die_time:
             q.QCoreApplication.processEvents(q.QEventLoop.AllEvents,100)
         
@@ -167,23 +167,14 @@ class enroll(htmlPy.Object):
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
-class attendance(htmlPy.Object):
+class attendancee(htmlPy.Object):
     
     def __init__(self,app_gui):
-        super(attendance, self).__init__()
+        super(attendancee, self).__init__()
         self.app_gui = app_gui
         self.token= None
-        self.lectures_array= None
-        self.admins_array=None
-        self.current_attendance=None
-        self.current_time=None
-        self.lecture_time=None
-        self.url="http://localhost/api/student/attendance.php"
-        self.test = 0
         # Initialize the class here, if required.
         return
-
-########################################################################################################################
 
     @htmlPy.Slot(str, result=str)
     def test(self, json_data):
@@ -221,20 +212,18 @@ class attendance(htmlPy.Object):
                 #if the fingerprint scanning returns 0 it means that the finger prints scanned are not similar and the user need to scan it again
                 if(test==1):
                     self.app_gui.template= ("./test.html",{"successes":["Yay it works!!! :) "]})
-                    return
                 if(test==0):
                     self.app_gui.template = ("./test.html", {"errors": [" Fingers doesn't match :)<br>Try licking your finger"]})
-                    return
                 # this means that there had been an unknown problem
                 if(test== -1):
                     self.app_gui.template = ("./test.html", {"errors": [" sorry there had been a problem :) "]})
-                    return
 
             
 
         else:
             self.app_gui.template = ("./enroll.html", {"errors": [" The Student Id you entered is wrong. Please enter a correct one"]})
-            return
+
+            
 
 ########################################################################################################################
 
@@ -265,7 +254,7 @@ class attendance(htmlPy.Object):
         self.admin_scan_flag=0
         # Initialize the class here, if required.
         return
-
+########################################################################################################################
     @htmlPy.Slot()
     def attendance_main(self):
         self.add_template_flag=0
@@ -441,7 +430,7 @@ class attendance(htmlPy.Object):
         ###############################
         # except Exception:
         #     self.app_gui.template = ("./attendance/admin_scan.html", {"errors": ["Server down :(. Try again later. "]})
-            
+########################################################################################################################
     @htmlPy.Slot()
     def student_scan(self):
         print "hi student"
@@ -539,6 +528,9 @@ class routing(htmlPy.Object):
 
         if(form_data['route']=="test"):
             self.app_gui.template = ("./test.html", { })
+        
+        if(form_data['route']=="exam"):
+            self.app_gui.template = ("./exam/exam_code.html", { })
     
         return 
 ########################################################################################################################    

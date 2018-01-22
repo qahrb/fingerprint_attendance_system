@@ -51,11 +51,12 @@ app.template = ("home.html", TOPIC_DICT)
 
 # # Binding of back-end functionalities with GUI
 # Import back-end functionalities
-from backend_code import enroll , attendance , routing
+from backend_code import enroll , attendance , routing, attendancee
 
 # Bind and registering of  back-end functionalities
 app.bind(enroll(app))
 app.bind(attendance(app))
+app.bind(attendancee(app))
 app.bind(routing(app))
 
 

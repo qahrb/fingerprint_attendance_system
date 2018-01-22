@@ -1,28 +1,190 @@
-{% extends "header.html" %} {% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- JqueryJs -->
+    <script src="{{'js/jquery.js'|staticfile}}"></script>
+    <!-- BootstrapJs -->
+    <script src="{{'js/bootstrap.min.js'|staticfile}}"></script>
+    <!-- Bootstrap -->
+    <link href="{{'css/bootstrap.min.css'|staticfile}}" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+    <script>
+        $(document).ready(backend.javascript_function());
+    </script>
+    <style>
+        .form-control:focus {
+            border-color: rgb(36, 62, 114);
+            /* there is something worng with the following defination with qtwebqt */
+            /* box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6); */
+            -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+        }
+
+         ::-webkit-input-placeholder {
+            color: red;
+            text-align: center;
+        }
+
+        input {
+            text-align: center
+        }
+
+        .divme {
+
+            /* background-color: red; */
+            position: absolute;
+            top: 5%;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            margin: auto;
+        }
+    </style>
+    {% endblock %}
+</head>
+
+<body class="divme">
 
 
-<script>
-    setTimeout(function(){attendance.attendance_main() },500);
-    function myFunction1() {
-        document.getElementById("demo").innerHTML="no lecture right now"; // The function returns the product of p1 and p2
-        setTimeout(function(){attendance.attendance_main() },4000);
-    }
-    function myFunction2() {
-        document.getElementById("show").innerHTML="<h4>An admin finger print is needed to open the attendance <br> Please click on the scanner to start scanning</h4>"; // The function returns the product of p1 and p2
-        setTimeout(function(){attendance.attendance_main() },4000);}
-</script>
 
-<div class="row">
-    <div id="show" class="col-md12 text-center">
-    </div>
-</div>
-<div class="row ">
-    <div class="col-sm-offset-4 col-sm-4">
-        <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/finger.jpg'|staticfile}}"
-            alt="finger">
-    </div>
-</div>
 
-<div id="demo" class="text-center"></div>
 
-{% endblock %}
+    <div class="container">
+
+
+
+
+        <script>
+            setTimeout(function () {
+                attendance.attendance_main()
+            }, 500);
+
+            function myFunction1() {
+                document.getElementById("demo").innerHTML = '<div class="alert alert-danger"><strong><h3>no lecture right now</h3></strong></div>'; // The function returns the product of p1 and p2
+                setTimeout(function () {
+                    attendance.attendance_main()
+                }, 4000);
+            }
+
+            function myFunction2() {
+                document.getElementById("show").innerHTML =
+                    "<h4>An admin finger print is needed to open the attendance <br> Please click on the scanner to start scanning</h4>"; // The function returns the product of p1 and p2
+                setTimeout(function () {
+                    attendance.attendance_main()
+                }, 4000);
+            }
+        </script>
+
+        <div class="row">
+            <div id="show" class="col-md12 text-center">
+                <h2>Admin Scan</h2>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-xs-offset-4 col-xs-4">
+                <img class=" img-responsive " style="display:block;margin:auto;max-height:100px;max-height:100px" src="{{'img/finger.jpg'|staticfile}}"
+                    alt="finger">
+            </div>
+        </div>
+        <div class="row">
+            <div id="show" class="col-md12 text-center">
+                <h4>Please put your finger on the scanner</h4>
+
+            </div>
+            <div class="row">
+                <div id="show" class="col-md12 text-center">
+
+                    <h6>If you are an Instructor or an Admin</h6>
+                </div>
+
+                <div id="demo" class="text-center"></div>
+                <div class="row ">
+                    <div class="col-xs-offset-2 col-xs-8">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>CMPE News and announcements</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="danger">
+                                        <td>11.01.2018</td>
+                                        <td>Graduation project deadline is by the 12th</td>
+
+                                    </tr>
+                                    <tr class="warning">
+                                        <td>11.01.2018</td>
+                                        <td>No Cmpe243 class for Today</td>
+
+                                    </tr>
+                                    <tr class="info">
+                                        <td>11.01.2018</td>
+                                        <td>Computer Engineering Department 2017-18 Fall Semester
+                                            <br> Graduation Project II Presentations Date:22th of January,2018</td>
+
+                                    </tr>
+                                    <tr class="warning">
+                                        <td>11.01.2018</td>
+                                        <td>Ahmed Abdo Should
+                                            <br> should go to DR. Mohamed Salama.</td>
+
+                                    </tr>
+                                    <tr class="warning">
+                                        <td>11.01.2018</td>
+                                        <td>No Cmpe112 class for Today</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                        <!-- Printing errors or messages -->
+
+                        <div class="row">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                {% if errors%} {% for error in errors%}
+                                <div class="alert alert-warning alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    {{error}}
+                                </div>
+                                {% endfor %} {% endif %}
+                            </div>
+                        </div>
+                    
+                <!-- Printing success alerts -->
+
+                <div class="row">
+                    <div class="col-sm-offset-4 col-sm-4">
+                        {% if successes%} {% for success in successes%}
+                        <div class="alert  alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            {{success}}
+                        </div>
+                        {% endfor %} {% endif %}
+                    </div>
+                </div>
+
+
+                <!-- <div class="row navbar navbar-fixed-bottom">
+                <div class="col-sm-offset-4 col-sm-4 text-center form-inline ">
+    
+                    <form action="routing.header" class="form-inline" id="form" data-bind="true">
+                        <input type="submit" class="btn btn-default" value="home" name="route" />
+                    </form>
+    
+                </div>
+            </div> -->
+
+
+</body>
+
+</html>
